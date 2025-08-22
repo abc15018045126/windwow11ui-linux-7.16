@@ -64,6 +64,14 @@ const AppWindow: React.FC<AppWindowProps> = ({
   const windowRef = useRef<HTMLDivElement>(null);
   const {theme} = useTheme();
 
+  const memoizedInitialData = useMemo(
+    () => ({
+      ...app.initialData,
+      ...commonData,
+    }),
+    [app.initialData, commonData],
+  );
+
   const handleMouseDownHeader = (e: React.MouseEvent<HTMLDivElement>) => {
     if (app.isMaximized || isResizing) return;
     if ((e.target as HTMLElement).closest('button')) return;
@@ -311,10 +319,7 @@ const AppWindow: React.FC<AppWindowProps> = ({
             app.id === 'themes' ? onWallpaperChange : undefined
           }
           openApp={openApp}
-          initialData={useMemo(
-            () => ({...app.initialData, ...commonData}),
-            [app.initialData, commonData],
-          )}
+          initialData={memoizedInitialData}
           clipboard={clipboard}
           handleCopy={handleCopy}
           handleCut={handleCut}
