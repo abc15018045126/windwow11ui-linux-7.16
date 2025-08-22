@@ -160,9 +160,6 @@ const NotebookApp: React.FC<AppComponentProps> = ({setTitle, initialData}) => {
     });
   }, []);
 
-  useEffect(() => {
-    updateStatusBar();
-  }, [content]);
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
@@ -294,10 +291,8 @@ const NotebookApp: React.FC<AppComponentProps> = ({setTitle, initialData}) => {
       <textarea
         ref={textareaRef}
         value={isLoading ? 'Loading...' : content}
-        onChange={e => {
-          handleContentChange(e.target.value);
-          updateStatusBar();
-        }}
+        onChange={e => handleContentChange(e.target.value)}
+        onKeyUp={updateStatusBar}
         onMouseUp={updateStatusBar}
         onClick={updateStatusBar}
         onSelect={updateStatusBar}
