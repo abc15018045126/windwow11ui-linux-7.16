@@ -145,9 +145,10 @@ const NotebookApp: React.FC<AppComponentProps> = ({setTitle, initialData}) => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
-    const {value, selectionStart, selectionEnd} = textarea;
+    const {selectionStart, selectionEnd} = textarea;
     const selectedCount = selectionEnd - selectionStart;
-    const textBeforeCursor = value.substring(0, selectionStart);
+    const cursorPosition = textarea.selectionStart;
+    const textBeforeCursor = content.substring(0, cursorPosition);
     const lines = textBeforeCursor.split('\n');
     const currentLineNumber = lines.length;
     const currentColumnNumber = lines[lines.length - 1].length + 1;
@@ -155,11 +156,14 @@ const NotebookApp: React.FC<AppComponentProps> = ({setTitle, initialData}) => {
     setStatusBarInfo({
       line: currentLineNumber,
       column: currentColumnNumber,
-      charCount: value.length,
+      charCount: content.length,
       selectedCount: selectedCount,
     });
-  }, []);
+  }, [content]);
 
+  useEffect(() => {
+    updateStatusBar();
+  }, [content, updateStatusBar]);
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
@@ -291,10 +295,8 @@ const NotebookApp: React.FC<AppComponentProps> = ({setTitle, initialData}) => {
       <textarea
         ref={textareaRef}
         value={isLoading ? 'Loading...' : content}
-        onChange={e => {
-          handleContentChange(e.target.value);
-          updateStatusBar();
-        }}
+        onChange={e => handleContentChange(e.target.value)}
+        onKeyUp={updateStatusBar}
         onMouseUp={updateStatusBar}
         onClick={updateStatusBar}
         onSelect={updateStatusBar}

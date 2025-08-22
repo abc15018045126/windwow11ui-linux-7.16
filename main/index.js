@@ -30,15 +30,11 @@ function createWindow() {
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
+    mainWindow.webContents.openDevTools();
   } else {
     // Correct path to production build, going up one level from 'main'
     mainWindow.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
   }
-
-  // Wait for the window to finish loading before opening DevTools
-  mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.openDevTools();
-  });
 }
 
 app.whenReady().then(() => {

@@ -15,10 +15,6 @@ export const useWindowManager = (
   desktopRef: React.RefObject<HTMLDivElement>,
 ) => {
   const [openApps, setOpenApps] = useState<OpenApp[]>([]);
-  const openAppsRef = useRef(openApps);
-  useEffect(() => {
-    openAppsRef.current = openApps;
-  }, [openApps]);
   const [activeAppInstanceId, setActiveAppInstanceId] = useState<string | null>(
     null,
   );
@@ -137,14 +133,14 @@ export const useWindowManager = (
 
       // If multiple instances are not allowed, check for an existing instance
       if (!appDef.allowMultipleInstances && !initialData) {
-        const existingAppInstance = openAppsRef.current.find(
+        const existingAppInstance = openApps.find(
           app => app.id === appDef!.id && !app.isMinimized,
         );
         if (existingAppInstance) {
           focusApp(existingAppInstance.instanceId);
           return;
         }
-        const minimizedInstance = openAppsRef.current.find(
+        const minimizedInstance = openApps.find(
           app => app.id === appDef!.id && app.isMinimized,
         );
         if (minimizedInstance) {
@@ -176,7 +172,7 @@ export const useWindowManager = (
       setOpenApps(currentOpenApps => [...currentOpenApps, newApp]);
       setActiveAppInstanceId(instanceId);
     },
-    [appDefinitions, nextZIndex, focusApp, toggleMinimizeApp],
+    [appDefinitions, nextZIndex, openApps],
   );
 
   const focusApp = useCallback(
@@ -222,7 +218,7 @@ export const useWindowManager = (
 
   const toggleMinimizeApp = useCallback(
     (instanceId: string) => {
-      const app = openAppsRef.current.find(a => a.instanceId === instanceId);
+      const app = openApps.find(a => a.instanceId === instanceId);
       if (!app) return;
 
       setOpenApps(prev =>
@@ -240,7 +236,7 @@ export const useWindowManager = (
         setActiveAppInstanceId(null);
       }
     },
-    [activeAppInstanceId, focusApp],
+    [openApps, activeAppInstanceId, focusApp],
   );
 
   const toggleMaximizeApp = useCallback(
