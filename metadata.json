@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Win11 React Gemini 2",
+  "description": "A React and Tailwind CSS application mimicking the Windows 11 desktop UI, designed to run in an Electron shell and featuring a Gemini API-powered chat application.",
+  "requestFramePermissions": []
+}

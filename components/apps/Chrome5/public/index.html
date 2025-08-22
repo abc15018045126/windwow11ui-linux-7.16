@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>远程 Electron 浏览器</title>
+  <style>
+    #browser {
+      width: 1200px;
+      height: 800px;
+      border: 1px solid #ccc;
+      background: black;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<h1>网页里的远程 Electron 浏览器</h1>
+<canvas id="browser"></canvas>
+
+<script>
+  const canvas = document.getElementById('browser');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 1200;
+  canvas.height = 800;
+
+  const ws = new WebSocket("ws://localhost:8081");
+  ws.binaryType = "arraybuffer";
+
+  let remoteWidth = 1200;
+  let remoteHeight = 800;
+  let zoomFactor = 1.0;
+
+  ws.onmessage = (msg) => {
+    if (typeof msg.data === "string") {
+      const packet = JSON.parse(msg.data);
+      if (packet.type === 'size') {
+        remoteWidth = packet.width;
+        remoteHeight = packet.height;
+      }
+      if (packet.type === 'zoom') {
+        zoomFactor = packet.factor;
+      }
+      return;
+    }
+
+    const blob = new Blob([msg.data], { type: 'image/png' });
+    const img = new Image();
+    img.src = URL.createObjectURL(blob);
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(img.src);
+    };
+  };
+
+  function sendMouseEvent(type, e) {
+    const scaleX = remoteWidth / canvas.width / zoomFactor;
+    const scaleY = remoteHeight / canvas.height / zoomFactor;
+
+    ws.send(JSON.stringify({
+      type: 'input',
+      payload: {
+        type: type,
+        x: e.offsetX * scaleX,
+        y: e.offsetY * scaleY,
+        button: 'left',
+        clickCount: 1
+      }
+    }));
+  }
+
+  canvas.addEventListener("click", (e) => {
+    sendMouseEvent('mouseDown', e);
+    sendMouseEvent('mouseUp', e);
+  });
+
+  canvas.addEventListener("mousemove", (e) => sendMouseEvent('mouseMove', e));
+  canvas.addEventListener("wheel", (e) => {
+    ws.send(JSON.stringify({
+      type: 'input',
+      payload: {
+        type: 'mouseWheel',
+        deltaX: e.deltaX,
+        deltaY: e.deltaY,
+        canScroll: true
+      }
+    }));
+  });
+
+  window.addEventListener("keydown", (e) => {
+    ws.send(JSON.stringify({
+      type: 'input',
+      payload: {
+        type: 'keyDown',
+        keyCode: e.key
+      }
+    }));
+  });
+
+  window.addEventListener("keyup", (e) => {
+    ws.send(JSON.stringify({
+      type: 'input',
+      payload: {
+        type: 'keyUp',
+        keyCode: e.key
+      }
+    }));
+  });
+</script>
+</body>
+</html>

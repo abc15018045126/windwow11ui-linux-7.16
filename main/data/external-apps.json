@@ -1,0 +1,9 @@
+[
+  {
+    "id": "chrome5",
+    "name": "Chrome 5",
+    "icon": "chrome5",
+    "isExternal": true,
+    "externalPath": "components/apps/Chrome5/main.js"
+  }
+]

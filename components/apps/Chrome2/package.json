@@ -1,0 +1,17 @@
+{
+  "name": "electron-vless-client",
+  "version": "1.0.0",
+  "description": "A VLESS client using Electron to bypass TLS fingerprinting.",
+  "main": "electroncf.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "electron": "^30.0.1"
+  }
+}
