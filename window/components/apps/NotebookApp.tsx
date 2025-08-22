@@ -291,8 +291,10 @@ const NotebookApp: React.FC<AppComponentProps> = ({setTitle, initialData}) => {
       <textarea
         ref={textareaRef}
         value={isLoading ? 'Loading...' : content}
-        onChange={e => handleContentChange(e.target.value)}
-        onKeyUp={updateStatusBar}
+        onChange={e => {
+          handleContentChange(e.target.value);
+          updateStatusBar();
+        }}
         onMouseUp={updateStatusBar}
         onClick={updateStatusBar}
         onSelect={updateStatusBar}
