@@ -8,7 +8,6 @@ const {initializeIpcHandlers} = require('./ipc');
 const {startApiServer} = require('./api');
 const {startTerminusServer} = require('./ws-terminus');
 const {startSftpServer} = require('./ws-sftp');
-const {startChrome3Proxy} = require('./proxy-chrome3'); // Import the new SOCKS5 proxy client
 const {setupHeaderStripping} = require('./header-stripper');
 
 function createWindow() {
@@ -51,12 +50,10 @@ app.whenReady().then(() => {
     startApiServer();
     startTerminusServer();
     startSftpServer();
-    startChrome3Proxy(); // Start the new SOCKS5 proxy client for Chrome 3
   }
 
   // Apply header stripping to enable loading restricted sites in webviews
 
-  setupHeaderStripping('persist:chrome3');
   setupHeaderStripping('persist:chrome6');
   // Re-enabling header stripping for Chrome 4. Its absence may be causing renderer
   // crashes on sites with aggressive anti-embedding policies.
@@ -65,8 +62,6 @@ app.whenReady().then(() => {
 
   // Add preload script to defeat frame-busting JS
   try {
-    const chrome3Session = session.fromPartition('persist:chrome3');
-    chrome3Session.setPreloads([frameBusterPath]);
     console.log(
       "[Main] Frame-buster preload script set for partition 'persist:chrome3'",
     );
