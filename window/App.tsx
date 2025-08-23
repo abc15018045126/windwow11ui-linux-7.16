@@ -42,15 +42,7 @@ const App: React.FC = () => {
 
   // A simple way to trigger refresh in filesystem-aware components
   const [refreshId, setRefreshId] = useState(0);
-  const triggerRefresh = useCallback(() => setRefreshId(id => id + 1), []);
-
-  const commonData = useMemo(
-    () => ({
-      refreshId,
-      triggerRefresh,
-    }),
-    [refreshId, triggerRefresh],
-  );
+  const triggerRefresh = () => setRefreshId(id => id + 1);
 
   const toggleStartMenu = useCallback(
     () => setIsStartMenuOpen(prev => !prev),
@@ -127,8 +119,14 @@ const App: React.FC = () => {
                   .map(app => (
                     <AppWindow
                       key={app.instanceId}
-                      app={app}
-                      commonData={commonData}
+                      app={{
+                        ...app,
+                        initialData: {
+                          ...app.initialData,
+                          refreshId,
+                          triggerRefresh,
+                        },
+                      }}
                       onClose={() => closeApp(app.instanceId)}
                       onMinimize={() => toggleMinimizeApp(app.instanceId)}
                       onMaximize={() => toggleMaximizeApp(app.instanceId)}

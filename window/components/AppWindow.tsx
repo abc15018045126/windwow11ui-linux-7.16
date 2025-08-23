@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useCallback, useMemo} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {OpenApp, ClipboardItem, FilesystemItem} from '../types';
 import {DiscoveredAppDefinition} from '../contexts/AppContext';
 import {TASKBAR_HEIGHT} from '../constants';
@@ -7,10 +7,6 @@ import Icon from './icon';
 
 interface AppWindowProps {
   app: OpenApp;
-  commonData: {
-    refreshId: number;
-    triggerRefresh: () => void;
-  };
   onClose: () => void;
   onMinimize: () => void;
   onMaximize: () => void;
@@ -30,7 +26,6 @@ interface AppWindowProps {
 
 const AppWindow: React.FC<AppWindowProps> = ({
   app,
-  commonData,
   onClose,
   onMinimize,
   onMaximize,
@@ -63,14 +58,6 @@ const AppWindow: React.FC<AppWindowProps> = ({
 
   const windowRef = useRef<HTMLDivElement>(null);
   const {theme} = useTheme();
-
-  const memoizedInitialData = useMemo(
-    () => ({
-      ...app.initialData,
-      ...commonData,
-    }),
-    [app.initialData, commonData],
-  );
 
   const handleMouseDownHeader = (e: React.MouseEvent<HTMLDivElement>) => {
     if (app.isMaximized || isResizing) return;
@@ -319,7 +306,7 @@ const AppWindow: React.FC<AppWindowProps> = ({
             app.id === 'themes' ? onWallpaperChange : undefined
           }
           openApp={openApp}
-          initialData={memoizedInitialData}
+          initialData={app.initialData}
           clipboard={clipboard}
           handleCopy={handleCopy}
           handleCut={handleCut}
