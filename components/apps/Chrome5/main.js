@@ -1,5 +1,5 @@
-const {app, BrowserWindow, session} = require('electron');
-const {startServer, setWindow} = require('./server');
+const { app, BrowserWindow, session } = require('electron');
+const { startServer, setWindow } = require('./server');
 
 let win;
 
@@ -10,7 +10,7 @@ function createWindow() {
     delete headers['X-Frame-Options'];
     delete headers['content-security-policy'];
     delete headers['Content-Security-Policy'];
-    callback({responseHeaders: headers});
+    callback({ responseHeaders: headers });
   });
 
   win = new BrowserWindow({
@@ -18,24 +18,22 @@ function createWindow() {
     height: 800,
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: true,
-    },
+      contextIsolation: true
+    }
   });
 
-  win.loadURL('https://github.com');
+  win.loadURL('https://github.com/login');
 
   win.webContents.on('did-finish-load', () => {
     const zoomFactor = win.webContents.getZoomFactor();
-    console.log('当前缩放比例:', zoomFactor);
+    console.log("当前缩放比例:", zoomFactor);
 
-    if (global.wss) {
-      global.wss.clients.forEach(client => {
-        client.send(
-          JSON.stringify({
-            type: 'zoom',
-            factor: zoomFactor,
-          }),
-        );
+    if (global.wssInput) {
+      global.wssInput.clients.forEach(client => {
+        client.send(JSON.stringify({
+          type: 'zoom',
+          factor: zoomFactor
+        }));
       });
     }
   });
@@ -44,7 +42,6 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  const {startServer, setWindow} = require('./server');
   startServer();
   createWindow();
 });
